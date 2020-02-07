@@ -4,7 +4,7 @@ import (
 	"github.com/fatih/color"
 )
 
-func listDiff(deps, deps2 map[string]string) error {
+func listDiff(deps, deps2 map[string]string) {
 	for dep, version := range deps {
 		if deps2[dep] != "" && deps2[dep] != version {
 			color.White(dep)
@@ -12,5 +12,4 @@ func listDiff(deps, deps2 map[string]string) error {
 			color.Red("\t" + deps2[dep])
 		}
 	}
-	return nil
 }

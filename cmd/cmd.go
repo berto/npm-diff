@@ -31,9 +31,7 @@ var diffCmd = &cobra.Command{
 		if err != nil {
 			return errors.Wrap(err, fmt.Sprintf("read second file: %s", args[1]))
 		}
-		if err := listDiff(deps, deps2); err != nil {
-			return errors.Wrap(err, "listing diffs")
-		}
+		listDiff(deps, deps2)
 		return nil
 	},
 }
