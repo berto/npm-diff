@@ -1,15 +1,87 @@
 package cmd
 
 import (
+	"strings"
+
 	"github.com/fatih/color"
 )
 
-func listDiff(deps, deps2 map[string]string) {
-	for dep, version := range deps {
-		if deps2[dep] != "" && deps2[dep] != version {
+const (
+	// Patch releases: 1.0 or 1.0.x or ~1.0.4
+	patch = iota
+	// Minor releases: 1 or 1.x or ^1.0.4
+	minor
+	// Major releases: * or x
+	major
+)
+
+func parseVersion(version string) (string, int) {
+	if version == "" {
+		return version, major
+	}
+	switch version[0] {
+	case '~':
+		return version[1:], patch
+	case '^':
+		return version[1:], minor
+	default:
+		return version, major
+	}
+}
+
+func fillVersion(version string) (newVersion []string) {
+	splitVersion := strings.Split(version, ".")
+	switch len(splitVersion) {
+	case 1:
+		newVersion = append(newVersion, splitVersion[0])
+		newVersion = append(newVersion, "*")
+		newVersion = append(newVersion, "*")
+	case 2:
+		newVersion = append(newVersion, splitVersion[0])
+		newVersion = append(newVersion, splitVersion[1])
+		newVersion = append(newVersion, "*")
+	case 3:
+		newVersion = append(newVersion, splitVersion[0])
+		newVersion = append(newVersion, splitVersion[1])
+		newVersion = append(newVersion, splitVersion[2])
+	}
+	return
+}
+
+func simplify(version string, updateType int) string {
+	newVersion := fillVersion(version)
+	switch updateType {
+	case patch:
+		newVersion[2] = "*"
+	case minor:
+		newVersion[1] = "*"
+		newVersion[2] = "*"
+	case major:
+		newVersion[0] = "*"
+	}
+	return strings.Join(newVersion, ".")
+}
+
+func diff(v1, v2 string) bool {
+	version1, type1 := parseVersion(v1)
+	version2, type2 := parseVersion(v2)
+	if type1 != type2 {
+		return true
+	}
+	c1, c2 := simplify(version1, type1), simplify(version2, type2)
+	if c1 != c2 {
+		return true
+	}
+	return false
+}
+
+func listDiff(deps1, deps2 map[string]string) {
+	for dep, version := range deps1 {
+		version2 := deps2[dep]
+		if diff(version, version2) {
 			color.White(dep)
 			color.Green("\t" + version)
-			color.Red("\t" + deps2[dep])
+			color.Red("\t" + version2)
 		}
 	}
 }
