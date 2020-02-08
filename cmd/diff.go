@@ -75,10 +75,10 @@ func diff(v1, v2 string) bool {
 	return false
 }
 
-func listDiff(deps1, deps2 map[string]string) {
+func listDiff(strict bool, deps1, deps2 map[string]string) {
 	for dep, version := range deps1 {
 		version2 := deps2[dep]
-		if diff(version, version2) {
+		if version2 != "" && ((strict && version != version2) || diff(version, version2)) {
 			color.White(dep)
 			color.Green("\t" + version)
 			color.Red("\t" + version2)

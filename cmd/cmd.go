@@ -9,6 +9,7 @@ import (
 
 // Execute runs diff command
 func Execute() {
+	diffCmd.PersistentFlags().Bool("all", false, "show all differences")
 	diffCmd.Execute()
 }
 
@@ -31,7 +32,11 @@ var diffCmd = &cobra.Command{
 		if err != nil {
 			return errors.Wrap(err, fmt.Sprintf("read second file: %s", args[1]))
 		}
-		listDiff(deps, deps2)
+		strict, err := cmd.Flags().GetBool("all")
+		if err != nil {
+			fmt.Println(err)
+		}
+		listDiff(strict, deps, deps2)
 		return nil
 	},
 }
