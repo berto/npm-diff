@@ -40,7 +40,7 @@ func fillVersion(version string) (newVersion []string) {
 		newVersion = append(newVersion, splitVersion[0])
 		newVersion = append(newVersion, splitVersion[1])
 		newVersion = append(newVersion, "*")
-	case 3:
+	default:
 		newVersion = append(newVersion, splitVersion[0])
 		newVersion = append(newVersion, splitVersion[1])
 		newVersion = append(newVersion, splitVersion[2])
