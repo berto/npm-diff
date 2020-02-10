@@ -76,12 +76,17 @@ func diff(v1, v2 string) bool {
 }
 
 func listDiff(strict bool, deps1, deps2 map[string]string) {
+	noChange := true
 	for dep, version := range deps1 {
 		version2 := deps2[dep]
 		if version2 != "" && ((strict && version != version2) || diff(version, version2)) {
+			noChange = false
 			color.White(dep)
 			color.Green("\t" + version)
 			color.Red("\t" + version2)
 		}
+	}
+	if noChange {
+		color.White("No Differences Found!")
 	}
 }
